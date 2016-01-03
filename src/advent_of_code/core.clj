@@ -28,10 +28,32 @@
 (defn which-floor [input]
   (count-floors-2 input))
 
-(def part1-in "day1/part1-in.txt")
+(def ^:private part1-in "day1/part1-in.txt")
+
+(defn- slurp-resource 
+  "slurps a resource.
+  CAUTION: not nice for big files"
+  [path]
+  (slurp (io/resource path)))
 
 (defn part1-answer []
-  (let [in (-> part1-in
-               io/resource
-               slurp)]
-    (which-floor in)))
+  (-> part1-in
+      slurp-resource
+      which-floor))
+
+;; part 2
+
+(defn enters-basement 
+  ([xs] (enters-basement xs 0 0))
+  ([xs floor pos]
+   (cond 
+     (neg? floor) pos
+     (empty? xs) nil
+     :else (let [new-xs (rest xs)
+                 floor-inc (next-floor (first xs))]
+             (enters-basement new-xs (+ floor-inc floor) (inc pos))))))
+
+(defn part2-answer []
+  (-> part1-in
+      slurp-resource
+      enters-basement))
